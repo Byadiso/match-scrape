@@ -1,59 +1,97 @@
-import React, { useState } from "react";
-import { AppBar, Toolbar, Typography, Button, IconButton, Drawer, List, ListItem, ListItemText, useTheme, useMediaQuery } from "@mui/material";
-import MenuIcon from '@mui/icons-material/Menu';
-import { Link } from "react-router-dom";  // Correctly import Link from React Router
+import { useState } from "react";
+import {
+  AppBar,
+  Box,
+  Button,
+  Drawer,
+  IconButton,
+  List,
+  ListItemButton,
+  ListItemText,
+  Toolbar,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import { NavLink } from "react-router-dom";
+
+const pages = [
+  ["/", "Home"],
+  ["/upcoming-matches", "Upcoming"],
+  ["/low-odds-matches", "My picks"],
+  ["/previous-matches", "Team performance"],
+  ["/simulator", "Bet Simulator"],
+];
 
 export default function Navbar() {
-  // State for the Drawer (side menu) on mobile
-  const [openDrawer, setOpenDrawer] = useState(false);
-
+  const [open, setOpen] = useState(false);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Check if screen size is mobile or smaller
-
-  // Function to toggle drawer (open/close)
-  const toggleDrawer = () => {
-    setOpenDrawer(!openDrawer);
-  };
-
+  const mobile = useMediaQuery(theme.breakpoints.down("md"));
   return (
-    <AppBar position="sticky" sx={{ background: "linear-gradient(90deg, #9c27b0, #2196f3)", boxShadow: 3 }}>
-      <Toolbar>
-        {/* Logo/Brand */}
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: "white", fontWeight: "bold" }}>
-          ⚡ Web3 Match Explorer
+    <AppBar
+      position="sticky"
+      sx={{
+        background: "linear-gradient(90deg, #49235e, #183a60)",
+        boxShadow: 3,
+      }}
+    >
+      <Toolbar sx={{ gap: 2 }}>
+        <Typography
+          variant="h6"
+          sx={{ flexGrow: 1, fontWeight: 750, fontSize: { xs: 16, sm: 19 } }}
+        >
+          Trying to beat the master
         </Typography>
-
-        {/* If on mobile, display the hamburger icon */}
-        {isMobile ? (
-          <IconButton color="inherit" onClick={toggleDrawer}>
+        {mobile ? (
+          <IconButton
+            color="inherit"
+            aria-label="Open navigation"
+            onClick={() => setOpen(true)}
+          >
             <MenuIcon />
           </IconButton>
         ) : (
-          // Otherwise, show navigation buttons
-          <>
-            <Button color="inherit" component={Link} to="/" sx={{ marginLeft: 2 }}>Home</Button>
-            <Button color="inherit" component={Link} to="/upcoming-matches" sx={{ marginLeft: 2 }}>Upcoming Matches</Button>
-            <Button color="inherit" component={Link} to="/low-odds-matches" sx={{ marginLeft: 2 }}>Picks of the day</Button>
-            <Button color="inherit" component={Link} to="/previous-matches" sx={{ marginLeft: 2 }}>previous matches</Button>
-          </>
+          <Box sx={{ display: "flex", gap: 0.5 }}>
+            {pages.map(([path, label]) => (
+              <Button
+                key={path}
+                component={NavLink}
+                to={path}
+                end={path === "/"}
+                color="inherit"
+                sx={{
+                  textTransform: "none",
+                  "&.active": { backgroundColor: "rgba(255,255,255,0.14)" },
+                }}
+              >
+                {label}
+              </Button>
+            ))}
+          </Box>
         )}
       </Toolbar>
-
-      {/* Drawer (Side Menu) for Mobile */}
-      <Drawer anchor="right" open={openDrawer} onClose={toggleDrawer}>
-        <List sx={{ width: 250 }}>
-          <ListItem button component={Link} to="/" onClick={toggleDrawer}>
-            <ListItemText primary="Home" />
-          </ListItem>
-          <ListItem button component={Link} to="/upcoming-matches" onClick={toggleDrawer}>
-            <ListItemText primary="Upcoming Matches" />
-          </ListItem>
-          <ListItem button component={Link} to="/low-odds-matches" onClick={toggleDrawer}>
-            <ListItemText primary="Low Odds Matches" />
-          </ListItem>
-          <ListItem button component={Link} to="/previous-matches" onClick={toggleDrawer}>
-            <ListItemText primary="Previous matches" />
-          </ListItem>
+      <Drawer
+        anchor="right"
+        open={open}
+        onClose={() => setOpen(false)}
+        slotProps={{
+          paper: { sx: { backgroundColor: "#191f2c", color: "#eef2f8" } },
+        }}
+      >
+        <List sx={{ width: 260, pt: 3 }} aria-label="Main navigation">
+          {pages.map(([path, label]) => (
+            <ListItemButton
+              key={path}
+              component={NavLink}
+              to={path}
+              end={path === "/"}
+              onClick={() => setOpen(false)}
+              sx={{ "&.active": { backgroundColor: "rgba(147,197,253,0.12)" } }}
+            >
+              <ListItemText primary={label} />
+            </ListItemButton>
+          ))}
         </List>
       </Drawer>
     </AppBar>

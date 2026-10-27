@@ -1,121 +1,215 @@
-import { Box, Typography, Chip, Paper } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Chip,
+  Paper,
+  Button,
+} from "@mui/material";
 
-export default function MatchCard({ match }) {
+const STATUS_LABELS = {
+  SCHEDULED: "Scheduled — time to be confirmed",
+  TIMED: "Scheduled",
+  IN_PLAY: "In progress",
+  PAUSED: "Half-time",
+  FINISHED: "Finished",
+  POSTPONED: "Postponed",
+  SUSPENDED: "Suspended",
+  CANCELLED: "Cancelled",
+  AWARDED: "Awarded",
+};
+
+export default function MatchCard({
+  match,
+  isPicked = false,
+  onAddPick,
+  onRemovePick,
+}) {
+  const score = match.score?.fullTime;
+
+  const hasScore =
+    Number.isFinite(score?.home) &&
+    Number.isFinite(score?.away);
+
+  const kickoff = match.utcDate
+    ? new Date(match.utcDate)
+    : null;
+
+  const formattedDate =
+    kickoff && !Number.isNaN(kickoff.getTime())
+      ? kickoff.toLocaleString(undefined, {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+          ...(match.status !== "SCHEDULED"
+            ? { hour: "2-digit", minute: "2-digit" }
+            : {}),
+        })
+      : "Date to be confirmed";
+
+  const isFinished = ["FINISHED", "AWARDED"].includes(
+  match.status
+);
+
+const isCancelled = match.status === "CANCELLED";
+
+const canAddPick =
+  !isFinished &&
+  !isCancelled &&
+  typeof onAddPick === "function";
+
+const canManagePick = isPicked
+  ? typeof onRemovePick === "function"
+  : canAddPick;
+
+function handlePickClick() {
+  if (isPicked) {
+    onRemovePick?.(match.id);
+  } else if (canAddPick) {
+    onAddPick(match);
+  }
+}
+
   return (
     <Paper
       sx={{
-        position: "relative",
-        background: "linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(233, 30, 99, 0.1))",
-        padding: 2,
+        background:
+          "linear-gradient(135deg, rgba(33,150,243,0.1), rgba(233,30,99,0.1))",
+        color: "white",
+        p: 3,
         borderRadius: "16px",
+        border: isPicked
+          ? "1px solid #ff4081"
+          : "1px solid rgba(255,255,255,0.1)",
         boxShadow: 8,
-        border: "1px solid transparent",
-        transition: "transform 0.3s ease, box-shadow 0.3s ease",
-        backdropFilter: "blur(5px)",  // Glass-like effect
-        maxWidth: "450px",  // Increased width to fit all elements
-        margin: "auto", // Center the card
-        overflow: "hidden", // Prevent overflow
-        height: "auto", // Flexible height
-        display: "flex", // Flexbox for better control
-        flexDirection: "column", // Stack items vertically
+        height: "100%",
+        boxSizing: "border-box",
+        display: "flex",
+        flexDirection: "column",
+        transition: "transform 0.2s ease",
         "&:hover": {
-          transform: "translateY(-10px)", // Hover effect
-          boxShadow: "0 12px 30px rgba(0, 0, 0, 0.15)", // Hover shadow
+          transform: "translateY(-4px)",
         },
       }}
     >
-      {/* Match Info */}
-      <Box sx={{ marginBottom: 2, paddingBottom: 1 }}>
-        <Typography
-          variant="h6"
-          color="primary"
-          fontWeight="bold"
-          sx={{
-            fontSize: { xs: "1rem", sm: "1.25rem" },
-            letterSpacing: "1px",
-            background: "linear-gradient(45deg,rgb(157, 61, 241),rgb(93, 19, 243))", // Web3 neon gradient text
-            WebkitBackgroundClip: "text",
-            color: "transparent",
-            textShadow: "0 0 6px rgba(255, 255, 255, 0.4)", // Reduced glow effect
-            lineHeight: 1.2, // Prevent text from crowding
-          }}
-        >
-          {match.homeTeam} vs {match.awayTeam}
-        </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: 1,
+          mb: 2,
+        }}
+      >
         <Typography
           variant="body2"
-          color="text.secondary"
-          sx={{
-            marginTop: 1,
-            fontSize: { xs: "0.75rem", sm: "0.875rem" },
-            color: "rgba(255, 255, 255, 0.7)", // Subtle white text for time
-          }}
+          sx={{ color: "#90caf9" }}
         >
-          ⏰ {match.time}
+          {match.competition?.name ||
+            "Competition unavailable"}
         </Typography>
+
+        {isPicked && (
+          <Chip
+            label="Picked"
+            size="small"
+            sx={{
+              backgroundColor: "rgba(255,64,129,0.15)",
+              color: "#ff80ab",
+            }}
+          />
+        )}
       </Box>
 
-      {/* Odds Section */}
-      <Box sx={{
-        display: "flex",
-        justifyContent: "space-between", // Space chips evenly on one line
-        gap: 3, // More space between chips
-        marginTop: 2, // Spacing above chips
-        paddingTop: 1, // Prevent overlap with other sections
-        width: "100%", // Ensure the Box spans the full width
-        maxWidth: "100%", // Ensure it fits within the card's width
-        boxSizing: "border-box", // Ensure padding is included in the width
-        flexWrap: "nowrap", // Prevent wrapping of chips
-      }}>
+      <Typography
+        variant="h6"
+        fontWeight="bold"
+        sx={{
+          fontSize: { xs: "1rem", sm: "1.25rem" },
+          overflowWrap: "anywhere",
+        }}
+      >
+        {match.homeTeam?.name || "TBD"}
+        {" vs "}
+        {match.awayTeam?.name || "TBD"}
+      </Typography>
+
+      <Typography
+        variant="body2"
+        sx={{ mt: 1.5, color: "grey.400" }}
+      >
+        {formattedDate}
+      </Typography>
+
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: 2,
+          mt: 3,
+          mb: 3,
+        }}
+      >
         <Chip
-          label={`🏆 Home: ${match.odds.homeWin}`}
+          label={
+            STATUS_LABELS[match.status] ||
+            match.status ||
+            "Status unavailable"
+          }
+          size="small"
           sx={{
-            backgroundColor: "rgba(33, 150, 243, 0.2)", // Neon blue background
-            color: "#2196F3", // Blue text
-            fontWeight: "600", // Bold text for emphasis
-            borderRadius: "12px",
-            padding: "8px 14px", // Adjusted padding for better text fit
-            boxShadow: "0 4px 8px rgba(33, 150, 243, 0.2)", // Softer blue shadow
-            transition: "all 0.3s ease",
-            "&:hover": {
-              backgroundColor: "rgba(33, 150, 243, 0.3)", // Slight hover effect
-              boxShadow: "0 6px 16px rgba(33, 150, 243, 0.3)", // Hover shadow
+            maxWidth: "100%",
+            height: "auto",
+            "& .MuiChip-label": {
+              whiteSpace: "normal",
+              py: 0.5,
             },
+            backgroundColor:
+              match.status === "FINISHED"
+                ? "rgba(76,175,80,0.18)"
+                : "rgba(33,150,243,0.18)",
+            color:
+              match.status === "FINISHED"
+                ? "#a5d6a7"
+                : "#90caf9",
           }}
         />
-        <Chip
-          label={`🤝 Draw: ${match.odds.draw}`}
-          sx={{
-            backgroundColor: "rgba(158, 158, 158, 0.2)", // Grayish background
-            color: "#9E9E9E", // Gray text
-            fontWeight: "600", // Emphasize the draw odds
-            borderRadius: "12px",
-            padding: "8px 14px", // Adjusted padding for better text fit
-            boxShadow: "0 4px 8px rgba(158, 158, 158, 0.2)", // Softer gray shadow
-            transition: "all 0.3s ease",
-            "&:hover": {
-              backgroundColor: "rgba(158, 158, 158, 0.3)", // Slight hover effect
-              boxShadow: "0 6px 16px rgba(158, 158, 158, 0.3)", // Hover shadow
-            },
-          }}
-        />
-        <Chip
-          label={`🚀 Away: ${match.odds.awayWin}`}
-          sx={{
-            backgroundColor: "rgba(233, 30, 99, 0.2)", // Neon pink background
-            color: "#E91E63", // Neon pink text
-            fontWeight: "600", // Bold text for emphasis
-            borderRadius: "12px",
-            padding: "8px 14px", // Adjusted padding for better text fit
-            boxShadow: "0 4px 8px rgba(233, 30, 99, 0.2)", // Softer pink shadow
-            transition: "all 0.3s ease",
-            "&:hover": {
-              backgroundColor: "rgba(233, 30, 99, 0.3)", // Slight hover effect
-              boxShadow: "0 6px 16px rgba(233, 30, 99, 0.3)", // Hover shadow
-            },
-          }}
-        />
+
+        {hasScore && (
+          <Typography variant="h5" fontWeight="bold">
+            {score.home} – {score.away}
+          </Typography>
+        )}
       </Box>
+
+      {canManagePick && (
+        <Box sx={{ mt: "auto" }}>
+          <Button
+            fullWidth
+            variant={isPicked ? "outlined" : "contained"}
+            onClick={handlePickClick}
+            aria-pressed={isPicked}
+            sx={{
+              color: isPicked ? "#ff80ab" : "white",
+              borderColor: "#ff4081",
+              backgroundColor: isPicked
+                ? "transparent"
+                : "#ad1457",
+              "&:hover": {
+                borderColor: "#ff80ab",
+                backgroundColor: isPicked
+                  ? "rgba(255,64,129,0.1)"
+                  : "#880e4f",
+              },
+            }}
+          >
+            {isPicked ? "Remove from picks" : "Mark as pick"}
+          </Button>
+        </Box>
+      )}
     </Paper>
   );
 }
