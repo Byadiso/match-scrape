@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html { color-scheme: dark; }
+body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: #121212; }
+* { box-sizing: border-box; }
+button, input, select { font: inherit; }
