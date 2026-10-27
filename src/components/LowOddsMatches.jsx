@@ -9,7 +9,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  LinearProgress,
   MenuItem,
   Paper,
   Stack,
@@ -27,10 +26,7 @@ import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
 
-import {
-  fetchMonthlyMatches,
-  TEAMS,
-} from "../services/footballApi";
+import { fetchMonthlyMatches, TEAMS } from "../services/footballApi";
 
 const PICKS_KEY = "football-picks-v1";
 const TEAMS_KEY = "football-pick-teams-v1";
@@ -76,9 +72,9 @@ function readPicks() {
           (match) =>
             match?.id &&
             match.utcDate &&
-            !Number.isNaN(Date.parse(match.utcDate))
+            !Number.isNaN(Date.parse(match.utcDate)),
         )
-        .map((match) => [match.id, match])
+        .map((match) => [match.id, match]),
     ).values(),
   ];
 }
@@ -86,9 +82,7 @@ function readPicks() {
 function readTeams() {
   const saved = readJSON(TEAMS_KEY, {});
 
-  return saved &&
-    typeof saved === "object" &&
-    !Array.isArray(saved)
+  return saved && typeof saved === "object" && !Array.isArray(saved)
     ? saved
     : {};
 }
@@ -96,17 +90,16 @@ function readTeams() {
 function monthKey(value = new Date()) {
   const date = new Date(value);
 
-  return `${date.getFullYear()}-${String(
-    date.getMonth() + 1
-  ).padStart(2, "0")}`;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+    2,
+    "0",
+  )}`;
 }
 
 function dayKey(value) {
   const date = new Date(value);
 
-  return `${monthKey(date)}-${String(
-    date.getDate()
-  ).padStart(2, "0")}`;
+  return `${monthKey(date)}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
 function shiftMonth(month, amount) {
@@ -118,15 +111,15 @@ function shiftMonth(month, amount) {
 function monthLabel(month) {
   const [year, number] = month.split("-").map(Number);
 
-  return new Date(year, number - 1, 1).toLocaleDateString(
-    undefined,
-    { month: "long", year: "numeric" }
-  );
+  return new Date(year, number - 1, 1).toLocaleDateString(undefined, {
+    month: "long",
+    year: "numeric",
+  });
 }
 
 function getTeams(match) {
   return [match.homeTeam, match.awayTeam].filter(
-    (team) => team && CLUB_IDS.has(team.id)
+    (team) => team && CLUB_IDS.has(team.id),
   );
 }
 
@@ -134,9 +127,7 @@ function getTrackedTeam(match, selections) {
   const teams = getTeams(match);
 
   return (
-    teams.find(
-      (team) => team.id === Number(selections[match.id])
-    ) ||
+    teams.find((team) => team.id === Number(selections[match.id])) ||
     (teams.length === 1 ? teams[0] : null)
   );
 }
@@ -157,18 +148,13 @@ function getOutcome(match, selections) {
     return "pending";
   }
 
-  const winningTeam =
-    winner === "HOME_TEAM"
-      ? match.homeTeam
-      : match.awayTeam;
+  const winningTeam = winner === "HOME_TEAM" ? match.homeTeam : match.awayTeam;
 
   return winningTeam?.id === team.id ? "won" : "lost";
 }
 
 function percentage(value, total) {
-  return total
-    ? `${((value / total) * 100).toFixed(1)}%`
-    : "—";
+  return total ? `${((value / total) * 100).toFixed(1)}%` : "—";
 }
 
 function getStats(matches, selections) {
@@ -235,10 +221,7 @@ function CalendarMonth({
   }
 
   return (
-    <Paper
-      elevation={0}
-      sx={{ ...panelStyle, overflow: "hidden" }}
-    >
+    <Paper elevation={0} sx={{ ...panelStyle, overflow: "hidden" }}>
       <Stack
         direction="row"
         alignItems="center"
@@ -251,10 +234,7 @@ function CalendarMonth({
             {monthLabel(month)}
           </Typography>
 
-          <Typography
-            variant="caption"
-            sx={{ color: "#aab5c5" }}
-          >
+          <Typography variant="caption" sx={{ color: "#aab5c5" }}>
             {matches.length} saved picks
           </Typography>
         </Box>
@@ -293,22 +273,20 @@ function CalendarMonth({
               backgroundColor: "rgba(255,255,255,0.025)",
             }}
           >
-            {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-              (day) => (
-                <Typography
-                  key={day}
-                  variant="caption"
-                  sx={{
-                    p: 1.5,
-                    textAlign: "center",
-                    color: "#aab5c5",
-                    fontWeight: 700,
-                  }}
-                >
-                  {day}
-                </Typography>
-              )
-            )}
+            {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+              <Typography
+                key={day}
+                variant="caption"
+                sx={{
+                  p: 1.5,
+                  textAlign: "center",
+                  color: "#aab5c5",
+                  fontWeight: 700,
+                }}
+              >
+                {day}
+              </Typography>
+            ))}
           </Box>
 
           <Box
@@ -337,8 +315,8 @@ function CalendarMonth({
                     backgroundColor: !valid
                       ? "rgba(0,0,0,0.12)"
                       : key === today
-                      ? "rgba(147,197,253,0.045)"
-                      : "transparent",
+                        ? "rgba(147,197,253,0.045)"
+                        : "transparent",
                   }}
                 >
                   {valid && (
@@ -354,11 +332,8 @@ function CalendarMonth({
                           borderRadius: "50%",
                           fontWeight: key === today ? 800 : 500,
                           backgroundColor:
-                            key === today
-                              ? "#93c5fd"
-                              : "transparent",
-                          color:
-                            key === today ? "#101827" : "#aab5c5",
+                            key === today ? "#93c5fd" : "transparent",
+                          color: key === today ? "#101827" : "#aab5c5",
                         }}
                       >
                         {day}
@@ -366,10 +341,7 @@ function CalendarMonth({
 
                       <Stack spacing={0.75}>
                         {dailyMatches.map((match) => {
-                          const result = getOutcome(
-                            match,
-                            selections
-                          );
+                          const result = getOutcome(match, selections);
                           const style = RESULTS[result];
 
                           return (
@@ -391,12 +363,10 @@ function CalendarMonth({
                                 color: "#eef2f8",
                                 p: 0.85,
                                 "&:hover": {
-                                  backgroundColor:
-                                    `${style.color}22`,
+                                  backgroundColor: `${style.color}22`,
                                 },
                                 "&:focus-visible": {
-                                  outline:
-                                    `2px solid ${style.color}`,
+                                  outline: `2px solid ${style.color}`,
                                   outlineOffset: 2,
                                 },
                               }}
@@ -441,14 +411,12 @@ function CalendarMonth({
                               >
                                 {match.status === "SCHEDULED"
                                   ? "Time TBC"
-                                  : new Date(
-                                      match.utcDate
-                                    ).toLocaleTimeString(
+                                  : new Date(match.utcDate).toLocaleTimeString(
                                       undefined,
                                       {
                                         hour: "2-digit",
                                         minute: "2-digit",
-                                      }
+                                      },
                                     )}
                               </Typography>
                             </Box>
@@ -474,9 +442,7 @@ export default function LowOddsMatches({
 }) {
   const [savedPicks, setSavedPicks] = useState(readPicks);
   const [selections, setSelections] = useState(readTeams);
-  const [startMonth, setStartMonth] = useState(() =>
-    monthKey()
-  );
+  const [startMonth, setStartMonth] = useState(() => monthKey());
   const [selectedId, setSelectedId] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
@@ -514,28 +480,20 @@ export default function LowOddsMatches({
 
   const sortedPicks = useMemo(
     () =>
-      [...picks].sort(
-        (a, b) => Date.parse(a.utcDate) - Date.parse(b.utcDate)
-      ),
-    [picks]
+      [...picks].sort((a, b) => Date.parse(a.utcDate) - Date.parse(b.utcDate)),
+    [picks],
   );
 
-  const selectedMatch =
-    picks.find((match) => match.id === selectedId) || null;
+  const selectedMatch = picks.find((match) => match.id === selectedId) || null;
 
   const selectedTeam = selectedMatch
     ? getTrackedTeam(selectedMatch, selections)
     : null;
 
-  const selectableTeams = selectedMatch
-    ? getTeams(selectedMatch)
-    : [];
+  const selectableTeams = selectedMatch ? getTeams(selectedMatch) : [];
 
   function savePicks(updated) {
-    userStorage.setItem(
-      PICKS_KEY,
-      JSON.stringify(updated)
-    );
+    userStorage.setItem(PICKS_KEY, JSON.stringify(updated));
 
     setSavedPicks(updated);
     onUpdatePicks?.(updated);
@@ -549,10 +507,7 @@ export default function LowOddsMatches({
     };
 
     try {
-      userStorage.setItem(
-        TEAMS_KEY,
-        JSON.stringify(updated)
-      );
+      userStorage.setItem(TEAMS_KEY, JSON.stringify(updated));
 
       setSelections(updated);
       setError("");
@@ -571,9 +526,7 @@ export default function LowOddsMatches({
 
         onRemovePick(matchId);
       } else {
-        savePicks(
-          readPicks().filter((match) => match.id !== matchId)
-        );
+        savePicks(readPicks().filter((match) => match.id !== matchId));
       }
 
       setSelectedId(null);
@@ -589,36 +542,25 @@ export default function LowOddsMatches({
     setNotice("");
 
     try {
-      if (
-        suppliedPicks !== undefined &&
-        typeof onUpdatePicks !== "function"
-      ) {
-        throw new Error(
-          "Pass onUpdatePicks={setPicks} to the tracker."
-        );
+      if (suppliedPicks !== undefined && typeof onUpdatePicks !== "function") {
+        throw new Error("Pass onUpdatePicks={setPicks} to the tracker.");
       }
 
       const fresh = await fetchMonthlyMatches(month, {
         force: true,
       });
 
-      const latest = new Map(
-        fresh.map((match) => [match.id, match])
-      );
+      const latest = new Map(fresh.map((match) => [match.id, match]));
 
-      const updated = readPicks().map(
-        (match) => latest.get(match.id) || match
-      );
+      const updated = readPicks().map((match) => latest.get(match.id) || match);
 
       savePicks(updated);
 
       setNotice(
-        `${monthLabel(month)} results updated. Scores and statuses may still be delayed by the API.`
+        `${monthLabel(month)} results updated. Scores and statuses may still be delayed by the API.`,
       );
     } catch (err) {
-      setError(
-        err.message || "Could not refresh results."
-      );
+      setError(err.message || "Could not refresh results.");
     } finally {
       setRefreshing(false);
     }
@@ -655,12 +597,8 @@ export default function LowOddsMatches({
             Pick tracker
           </Typography>
 
-          <Typography
-            variant="body2"
-            sx={{ mt: 0.75, color: "#aab5c5" }}
-          >
-            {picks.length} saved picks · Monthly results
-            and performance
+          <Typography variant="body2" sx={{ mt: 0.75, color: "#aab5c5" }}>
+            {picks.length} saved picks · Monthly results and performance
           </Typography>
         </Box>
 
@@ -668,9 +606,7 @@ export default function LowOddsMatches({
           <Button
             aria-label="Previous month"
             disabled={startMonth <= "2000-01"}
-            onClick={() =>
-              setStartMonth((month) => shiftMonth(month, -1))
-            }
+            onClick={() => setStartMonth((month) => shiftMonth(month, -1))}
             sx={{ minWidth: 40, color: "#cbd5e1" }}
           >
             <ChevronLeftRoundedIcon />
@@ -689,9 +625,7 @@ export default function LowOddsMatches({
           <Button
             aria-label="Next month"
             disabled={startMonth >= "2100-11"}
-            onClick={() =>
-              setStartMonth((month) => shiftMonth(month, 1))
-            }
+            onClick={() => setStartMonth((month) => shiftMonth(month, 1))}
             sx={{ minWidth: 40, color: "#cbd5e1" }}
           >
             <ChevronRightRoundedIcon />
@@ -709,13 +643,6 @@ export default function LowOddsMatches({
         <Alert severity="info" sx={{ mb: 2 }}>
           {notice}
         </Alert>
-      )}
-
-      {refreshing && (
-        <LinearProgress
-          aria-label="Refreshing match results"
-          sx={{ mb: 2 }}
-        />
       )}
 
       <TableContainer
@@ -753,10 +680,7 @@ export default function LowOddsMatches({
                 "Loss rate",
                 "Losses / all picks",
               ].map((label, index) => (
-                <TableCell
-                  key={label}
-                  align={index === 0 ? "left" : "right"}
-                >
+                <TableCell key={label} align={index === 0 ? "left" : "right"}>
                   {label}
                 </TableCell>
               ))}
@@ -766,14 +690,10 @@ export default function LowOddsMatches({
           <TableBody>
             {months.map((month) => {
               const monthlyPicks = picks.filter(
-                (match) =>
-                  monthKey(match.utcDate) === month
+                (match) => monthKey(match.utcDate) === month,
               );
 
-              const stats = getStats(
-                monthlyPicks,
-                selections
-              );
+              const stats = getStats(monthlyPicks, selections);
 
               return (
                 <TableRow key={month}>
@@ -781,19 +701,13 @@ export default function LowOddsMatches({
                   <TableCell align="right">{stats.total}</TableCell>
 
                   <TableCell align="right">
-                    <Box
-                      component="span"
-                      sx={{ color: RESULTS.won.color }}
-                    >
+                    <Box component="span" sx={{ color: RESULTS.won.color }}>
                       {stats.won}
                     </Box>
                   </TableCell>
 
                   <TableCell align="right">
-                    <Box
-                      component="span"
-                      sx={{ color: RESULTS.lost.color }}
-                    >
+                    <Box component="span" sx={{ color: RESULTS.lost.color }}>
                       {stats.lost}
                     </Box>
                   </TableCell>
@@ -804,9 +718,7 @@ export default function LowOddsMatches({
                     {stats.pending + stats.choose}
                   </TableCell>
 
-                  <TableCell align="right">
-                    {stats.cancelled}
-                  </TableCell>
+                  <TableCell align="right">{stats.cancelled}</TableCell>
 
                   <TableCell align="right">
                     {percentage(stats.won, stats.completed)}
@@ -835,10 +747,9 @@ export default function LowOddsMatches({
           lineHeight: 1.8,
         }}
       >
-        Win and loss rates use completed picks: wins, losses,
-        and draws. Pending, unassigned, and cancelled picks are
-        excluded. “Losses / all picks” uses every saved pick
-        in the month.
+        Win and loss rates use completed picks: wins, losses, and draws.
+        Pending, unassigned, and cancelled picks are excluded. “Losses / all
+        picks” uses every saved pick in the month.
       </Typography>
 
       <Stack
@@ -853,12 +764,9 @@ export default function LowOddsMatches({
         ))}
       </Stack>
 
-      <Typography
-        variant="body2"
-        sx={{ color: "#aab5c5", mb: 2 }}
-      >
-        Select a match for details. Dates use your local timezone.
-        On mobile, swipe the calendar sideways.
+      <Typography variant="body2" sx={{ color: "#aab5c5", mb: 2 }}>
+        Select a match for details. Dates use your local timezone. On mobile,
+        swipe the calendar sideways.
       </Typography>
 
       {picks.length === 0 && (
@@ -873,7 +781,7 @@ export default function LowOddsMatches({
             key={month}
             month={month}
             matches={sortedPicks.filter(
-              (match) => monthKey(match.utcDate) === month
+              (match) => monthKey(match.utcDate) === month,
             )}
             selections={selections}
             onOpen={setSelectedId}
@@ -903,41 +811,26 @@ export default function LowOddsMatches({
             </DialogTitle>
 
             <DialogContent>
-              <Typography
-                variant="body2"
-                sx={{ color: "#aab5c5", mb: 2 }}
-              >
+              <Typography variant="body2" sx={{ color: "#aab5c5", mb: 2 }}>
                 {selectedMatch.competition?.name}
                 {" · "}
-                {new Date(
-                  selectedMatch.utcDate
-                ).toLocaleString()}
+                {new Date(selectedMatch.utcDate).toLocaleString()}
               </Typography>
 
-              <ResultChip
-                result={getOutcome(selectedMatch, selections)}
-              />
+              <ResultChip result={getOutcome(selectedMatch, selections)} />
 
               {selectedMatch.score?.fullTime?.home != null &&
                 selectedMatch.score?.fullTime?.away != null && (
-                  <Typography
-                    variant="h4"
-                    fontWeight={800}
-                    sx={{ my: 2 }}
-                  >
+                  <Typography variant="h4" fontWeight={800} sx={{ my: 2 }}>
                     {selectedMatch.score.fullTime.home}
                     {" – "}
                     {selectedMatch.score.fullTime.away}
                   </Typography>
                 )}
 
-              <Typography
-                variant="body2"
-                sx={{ mt: 2, color: "#cbd5e1" }}
-              >
+              <Typography variant="body2" sx={{ mt: 2, color: "#cbd5e1" }}>
                 Tracking:{" "}
-                {selectedTeam?.name ||
-                  "Choose the team you picked to win"}
+                {selectedTeam?.name || "Choose the team you picked to win"}
               </Typography>
 
               {selectableTeams.length > 1 && (
@@ -947,10 +840,7 @@ export default function LowOddsMatches({
                   label="Team you picked to win"
                   value={selectedTeam?.id || ""}
                   onChange={(event) =>
-                    chooseTeam(
-                      selectedMatch.id,
-                      event.target.value
-                    )
+                    chooseTeam(selectedMatch.id, event.target.value)
                   }
                   slotProps={{
                     select: {
@@ -1001,9 +891,9 @@ export default function LowOddsMatches({
                   lineHeight: 1.8,
                 }}
               >
-                Results follow the API’s final winner,
-                including extra time or penalties. This tracks
-                team wins rather than a 90-minute betting result.
+                Results follow the API’s final winner, including extra time or
+                penalties. This tracks team wins rather than a 90-minute betting
+                result.
               </Typography>
             </DialogContent>
 

@@ -24,10 +24,7 @@ import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
 
 import Loader from "./LoaderComponent";
 
-import {
-  fetchMonthlyMatches,
-  TEAMS,
-} from "../services/footballApi";
+import { fetchMonthlyMatches, TEAMS } from "../services/footballApi";
 
 const TEAM_IDS = new Set(TEAMS.map((team) => team.id));
 const FINISHED = new Set(["FINISHED", "AWARDED"]);
@@ -93,38 +90,38 @@ const menuProps = {
 function currentMonth() {
   const date = new Date();
 
-  return `${date.getFullYear()}-${String(
-    date.getMonth() + 1
-  ).padStart(2, "0")}`;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+    2,
+    "0",
+  )}`;
 }
 
 function shiftMonth(month, amount) {
   const [year, number] = month.split("-").map(Number);
   const date = new Date(year, number - 1 + amount, 1);
 
-  return `${date.getFullYear()}-${String(
-    date.getMonth() + 1
-  ).padStart(2, "0")}`;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+    2,
+    "0",
+  )}`;
 }
 
 function monthLabel(month) {
   const [year, number] = month.split("-").map(Number);
 
-  return new Date(year, number - 1, 1).toLocaleDateString(
-    undefined,
-    { month: "long", year: "numeric" }
-  );
+  return new Date(year, number - 1, 1).toLocaleDateString(undefined, {
+    month: "long",
+    year: "numeric",
+  });
 }
 
 function percent(value, total) {
-  return total
-    ? `${((value / total) * 100).toFixed(1)}%`
-    : "—";
+  return total ? `${((value / total) * 100).toFixed(1)}%` : "—";
 }
 
 function favoriteTeams(match) {
   return [match.homeTeam, match.awayTeam].filter(
-    (team) => team && TEAM_IDS.has(team.id)
+    (team) => team && TEAM_IDS.has(team.id),
   );
 }
 
@@ -137,10 +134,7 @@ function getResult(match, teamId) {
     return "unknown";
   }
 
-  const winningTeam =
-    winner === "HOME_TEAM"
-      ? match.homeTeam
-      : match.awayTeam;
+  const winningTeam = winner === "HOME_TEAM" ? match.homeTeam : match.awayTeam;
 
   return winningTeam?.id === teamId ? "won" : "lost";
 }
@@ -235,9 +229,7 @@ export default function PreviousMatches() {
       })
       .catch((err) => {
         if (active) {
-          setError(
-            err.message || "Could not load previous matches."
-          );
+          setError(err.message || "Could not load previous matches.");
         }
       })
       .finally(() => {
@@ -253,11 +245,8 @@ export default function PreviousMatches() {
     () =>
       matches
         .filter((match) => FINISHED.has(match.status))
-        .sort(
-          (a, b) =>
-            Date.parse(b.utcDate) - Date.parse(a.utcDate)
-        ),
-    [matches]
+        .sort((a, b) => Date.parse(b.utcDate) - Date.parse(a.utcDate)),
+    [matches],
   );
 
   const records = useMemo(
@@ -267,16 +256,16 @@ export default function PreviousMatches() {
           teamId: team.id,
           match,
           result: getResult(match, team.id),
-        }))
+        })),
       ),
-    [previousMatches]
+    [previousMatches],
   );
 
   const teamRows = useMemo(
     () =>
       TEAMS.map((team) => {
         const teamRecords = records.filter(
-          (record) => record.teamId === team.id
+          (record) => record.teamId === team.id,
         );
 
         return {
@@ -285,7 +274,7 @@ export default function PreviousMatches() {
           stats: summarize(teamRecords),
         };
       }),
-    [records]
+    [records],
   );
 
   const summary = useMemo(
@@ -293,33 +282,25 @@ export default function PreviousMatches() {
       summarize(
         teamFilter === "all"
           ? records
-          : records.filter(
-              (record) =>
-                record.teamId === Number(teamFilter)
-            )
+          : records.filter((record) => record.teamId === Number(teamFilter)),
       ),
-    [records, teamFilter]
+    [records, teamFilter],
   );
 
   const visibleMatches = useMemo(
     () =>
       previousMatches.filter((match) => {
         const teams = favoriteTeams(match).filter(
-          (team) =>
-            teamFilter === "all" ||
-            team.id === Number(teamFilter)
+          (team) => teamFilter === "all" || team.id === Number(teamFilter),
         );
 
         return (
           teams.length > 0 &&
           (resultFilter === "all" ||
-            teams.some(
-              (team) =>
-                getResult(match, team.id) === resultFilter
-            ))
+            teams.some((team) => getResult(match, team.id) === resultFilter))
         );
       }),
-    [previousMatches, teamFilter, resultFilter]
+    [previousMatches, teamFilter, resultFilter],
   );
 
   function changeMonth(value) {
@@ -334,8 +315,8 @@ export default function PreviousMatches() {
   }
 
   const selectedTeamName =
-    TEAMS.find((team) => team.id === Number(teamFilter))
-      ?.name || "All favorite clubs";
+    TEAMS.find((team) => team.id === Number(teamFilter))?.name ||
+    "All favorite clubs";
 
   return (
     <Box
@@ -370,8 +351,8 @@ export default function PreviousMatches() {
               variant="body2"
               sx={{ mt: 1, color: "#aab5c5", maxWidth: 550 }}
             >
-              Monthly wins, losses, and draws for your favorite
-              clubs, independently of your saved picks.
+              Monthly wins, losses, and draws for your favorite clubs,
+              independently of your saved picks.
             </Typography>
           </Box>
 
@@ -379,9 +360,7 @@ export default function PreviousMatches() {
             variant="outlined"
             startIcon={<RefreshRoundedIcon />}
             disabled={loading}
-            onClick={() =>
-              setRefreshVersion((value) => value + 1)
-            }
+            onClick={() => setRefreshVersion((value) => value + 1)}
             sx={{
               textTransform: "none",
               color: "#93c5fd",
@@ -392,10 +371,7 @@ export default function PreviousMatches() {
           </Button>
         </Stack>
 
-        <Paper
-          elevation={0}
-          sx={{ ...panelStyle, p: 2.5, mb: 3 }}
-        >
+        <Paper elevation={0} sx={{ ...panelStyle, p: 2.5, mb: 3 }}>
           <Stack
             direction={{ xs: "column", sm: "row" }}
             spacing={2}
@@ -405,9 +381,7 @@ export default function PreviousMatches() {
               <Button
                 aria-label="Previous month"
                 disabled={loading || month <= "2000-01"}
-                onClick={() =>
-                  changeMonth(shiftMonth(month, -1))
-                }
+                onClick={() => changeMonth(shiftMonth(month, -1))}
                 sx={{ minWidth: 36, color: "#cbd5e1" }}
               >
                 <ChevronLeftRoundedIcon />
@@ -419,9 +393,7 @@ export default function PreviousMatches() {
                 size="small"
                 value={month}
                 disabled={loading}
-                onChange={(event) =>
-                  changeMonth(event.target.value)
-                }
+                onChange={(event) => changeMonth(event.target.value)}
                 slotProps={{
                   inputLabel: { shrink: true },
                   htmlInput: {
@@ -435,9 +407,7 @@ export default function PreviousMatches() {
               <Button
                 aria-label="Next month"
                 disabled={loading || month >= currentMonth()}
-                onClick={() =>
-                  changeMonth(shiftMonth(month, 1))
-                }
+                onClick={() => changeMonth(shiftMonth(month, 1))}
                 sx={{ minWidth: 36, color: "#cbd5e1" }}
               >
                 <ChevronRightRoundedIcon />
@@ -449,9 +419,7 @@ export default function PreviousMatches() {
               label="Club"
               size="small"
               value={teamFilter}
-              onChange={(event) =>
-                setTeamFilter(event.target.value)
-              }
+              onChange={(event) => setTeamFilter(event.target.value)}
               slotProps={{
                 select: { MenuProps: menuProps },
               }}
@@ -481,7 +449,7 @@ export default function PreviousMatches() {
         </Paper>
 
         {loading ? (
-          <Loader />
+          <Loader variant="table" />
         ) : error ? (
           <Alert
             severity="error"
@@ -489,9 +457,7 @@ export default function PreviousMatches() {
               <Button
                 color="inherit"
                 size="small"
-                onClick={() =>
-                  setRefreshVersion((value) => value + 1)
-                }
+                onClick={() => setRefreshVersion((value) => value + 1)}
               >
                 Retry
               </Button>
@@ -507,9 +473,7 @@ export default function PreviousMatches() {
 
             <Typography sx={{ color: "#aab5c5", mt: 0.5, mb: 3 }}>
               {selectedTeamName} ·{" "}
-              {month === currentMonth()
-                ? "Month to date"
-                : "Monthly results"}
+              {month === currentMonth() ? "Month to date" : "Monthly results"}
             </Typography>
 
             <Box
@@ -560,10 +524,9 @@ export default function PreviousMatches() {
                 color: "#cbd5e1",
               }}
             >
-              Rates use wins + losses + draws. A fixture between
-              two favorites gives each club its own result in the
-              statistics, but appears once in the fixture list.
-              Unconfirmed results are excluded from rates.
+              Rates use wins + losses + draws. A fixture between two favorites
+              gives each club its own result in the statistics, but appears once
+              in the fixture list. Unconfirmed results are excluded from rates.
             </Alert>
 
             <Typography
@@ -600,11 +563,7 @@ export default function PreviousMatches() {
                     ].map((label, index) => (
                       <TableCell
                         key={label}
-                        align={
-                          index > 0 && index < 8
-                            ? "right"
-                            : "left"
-                        }
+                        align={index > 0 && index < 8 ? "right" : "left"}
                       >
                         {label}
                       </TableCell>
@@ -629,12 +588,10 @@ export default function PreviousMatches() {
                             setTeamFilter(
                               teamFilter === String(team.id)
                                 ? "all"
-                                : String(team.id)
+                                : String(team.id),
                             )
                           }
-                          aria-pressed={
-                            teamFilter === String(team.id)
-                          }
+                          aria-pressed={teamFilter === String(team.id)}
                           sx={{
                             p: 0,
                             minWidth: 0,
@@ -648,31 +605,17 @@ export default function PreviousMatches() {
                         </Button>
                       </TableCell>
 
-                      <TableCell align="right">
-                        {team.stats.total}
-                      </TableCell>
+                      <TableCell align="right">{team.stats.total}</TableCell>
+
+                      <TableCell align="right">{team.stats.won}</TableCell>
+
+                      <TableCell align="right">{team.stats.lost}</TableCell>
+
+                      <TableCell align="right">{team.stats.draw}</TableCell>
 
                       <TableCell align="right">
-                        {team.stats.won}
-                      </TableCell>
-
-                      <TableCell align="right">
-                        {team.stats.lost}
-                      </TableCell>
-
-                      <TableCell align="right">
-                        {team.stats.draw}
-                      </TableCell>
-
-                      <TableCell align="right">
-                        <Box
-                          component="span"
-                          sx={{ color: RESULTS.won.color }}
-                        >
-                          {percent(
-                            team.stats.won,
-                            team.stats.resolved
-                          )}
+                        <Box component="span" sx={{ color: RESULTS.won.color }}>
+                          {percent(team.stats.won, team.stats.resolved)}
                         </Box>
                       </TableCell>
 
@@ -681,27 +624,18 @@ export default function PreviousMatches() {
                           component="span"
                           sx={{ color: RESULTS.lost.color }}
                         >
-                          {percent(
-                            team.stats.lost,
-                            team.stats.resolved
-                          )}
+                          {percent(team.stats.lost, team.stats.resolved)}
                         </Box>
                       </TableCell>
 
                       <TableCell align="right">
-                        {percent(
-                          team.stats.draw,
-                          team.stats.resolved
-                        )}
+                        {percent(team.stats.draw, team.stats.resolved)}
                       </TableCell>
 
                       <TableCell>
                         <Stack direction="row" spacing={0.5}>
                           {team.records
-                            .filter(
-                              (record) =>
-                                record.result !== "unknown"
-                            )
+                            .filter((record) => record.result !== "unknown")
                             .slice(0, 5)
                             .map((record) => (
                               <ResultChip
@@ -736,9 +670,9 @@ export default function PreviousMatches() {
                 lineHeight: 1.8,
               }}
             >
-              Latest form shows up to five results in this month,
-              newest first. Played includes unconfirmed finished
-              results; percentages exclude them.
+              Latest form shows up to five results in this month, newest first.
+              Played includes unconfirmed finished results; percentages exclude
+              them.
             </Typography>
 
             <Stack
@@ -749,11 +683,7 @@ export default function PreviousMatches() {
               sx={{ mb: 2 }}
             >
               <Box>
-                <Typography
-                  component="h2"
-                  variant="h6"
-                  fontWeight={700}
-                >
+                <Typography component="h2" variant="h6" fontWeight={700}>
                   Match results
                 </Typography>
 
@@ -771,9 +701,7 @@ export default function PreviousMatches() {
                 label="Result"
                 size="small"
                 value={resultFilter}
-                onChange={(event) =>
-                  setResultFilter(event.target.value)
-                }
+                onChange={(event) => setResultFilter(event.target.value)}
                 slotProps={{
                   select: { MenuProps: menuProps },
                 }}
@@ -806,11 +734,7 @@ export default function PreviousMatches() {
                 </Typography>
               </Paper>
             ) : (
-              <TableContainer
-                component={Paper}
-                elevation={0}
-                sx={panelStyle}
-              >
+              <TableContainer component={Paper} elevation={0} sx={panelStyle}>
                 <Table
                   size="small"
                   aria-label="Finished match results"
@@ -831,7 +755,7 @@ export default function PreviousMatches() {
                       const teams = favoriteTeams(match).filter(
                         (team) =>
                           teamFilter === "all" ||
-                          team.id === Number(teamFilter)
+                          team.id === Number(teamFilter),
                       );
 
                       const score = match.score?.fullTime;
@@ -843,19 +767,17 @@ export default function PreviousMatches() {
                       return (
                         <TableRow key={match.id}>
                           <TableCell sx={{ whiteSpace: "nowrap" }}>
-                            {new Date(
-                              match.utcDate
-                            ).toLocaleDateString(undefined, {
-                              day: "numeric",
-                              month: "short",
-                            })}
+                            {new Date(match.utcDate).toLocaleDateString(
+                              undefined,
+                              {
+                                day: "numeric",
+                                month: "short",
+                              },
+                            )}
                           </TableCell>
 
                           <TableCell>
-                            <Typography
-                              variant="body2"
-                              fontWeight={650}
-                            >
+                            <Typography variant="body2" fontWeight={650}>
                               {match.homeTeam?.name}
                             </Typography>
 
@@ -866,8 +788,7 @@ export default function PreviousMatches() {
                               vs {match.awayTeam?.name}
                             </Typography>
 
-                            {match.score?.duration ===
-                              "PENALTY_SHOOTOUT" && (
+                            {match.score?.duration === "PENALTY_SHOOTOUT" && (
                               <Typography
                                 variant="caption"
                                 sx={{ color: "#aab5c5" }}
@@ -876,8 +797,7 @@ export default function PreviousMatches() {
                               </Typography>
                             )}
 
-                            {match.score?.duration ===
-                              "EXTRA_TIME" && (
+                            {match.score?.duration === "EXTRA_TIME" && (
                               <Typography
                                 variant="caption"
                                 sx={{ color: "#aab5c5" }}
@@ -894,9 +814,7 @@ export default function PreviousMatches() {
                               whiteSpace: "nowrap",
                             }}
                           >
-                            {hasScore
-                              ? `${score.home} – ${score.away}`
-                              : "—"}
+                            {hasScore ? `${score.home} – ${score.away}` : "—"}
                           </TableCell>
 
                           <TableCell>
@@ -909,10 +827,7 @@ export default function PreviousMatches() {
                                   spacing={1}
                                 >
                                   <ResultChip
-                                    result={getResult(
-                                      match,
-                                      team.id
-                                    )}
+                                    result={getResult(match, team.id)}
                                   />
 
                                   <Typography
@@ -946,10 +861,9 @@ export default function PreviousMatches() {
                 lineHeight: 1.8,
               }}
             >
-              Results follow the API’s final winner, including
-              extra time or penalties. Only competitions available
-              on your plan are included. Past win rates are not
-              probabilities for the next fixture.
+              Results follow the API’s final winner, including extra time or
+              penalties. Only competitions available on your plan are included.
+              Past win rates are not probabilities for the next fixture.
             </Typography>
           </>
         )}

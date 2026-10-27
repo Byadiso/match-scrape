@@ -6,11 +6,13 @@ import UpcomingMatches from "./components/UpcomingMatches";
 import PreviousMatches from "./components/PreviousMatches";
 
 import BetSimulator from "./components/BetSimulator";
+import ApiLoadingNotice from "./components/ApiLoadingNotice";
 
 export default function App() {
   return (
     <Router>
       <Navbar /> {/* Render Navbar */}
+      <ApiLoadingNotice />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/upcoming-matches" element={<UpcomingMatches />} />
